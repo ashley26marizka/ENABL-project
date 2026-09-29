@@ -1,5 +1,7 @@
 # System Design — Scenario Analytics Platform
 
+![Architecture Diagram](architecture.svg)
+
 ## Current Architecture (100 scenarios/day)
 
 ```
