@@ -7,7 +7,7 @@ services:
     startCommand: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: CSV_PATH
-        value: data/scenarios.csv
+        value: ../data/scenarios.csv
       - key: LOG_LEVEL
         value: INFO
       - key: DATABASE_URL
