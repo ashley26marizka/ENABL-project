@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -21,7 +22,7 @@ class ScenarioSummaryOut(BaseModel):
     success_rate: Decimal
     total_duration_seconds: Decimal
     average_duration_seconds: Decimal
-    last_updated: datetime | None = None
+    last_updated: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 
@@ -29,7 +30,7 @@ class ScenarioSummaryOut(BaseModel):
 class ScenarioOut(BaseModel):
     scenario_id: int
     scenario_name: str
-    created_at: datetime | None = None
+    created_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 
@@ -37,6 +38,6 @@ class ScenarioOut(BaseModel):
 class ScenarioDetailOut(BaseModel):
     scenario_id: int
     scenario_name: str
-    summary: ScenarioSummaryOut | None = None
+    summary: Optional[ScenarioSummaryOut] = None
 
     model_config = {"from_attributes": True}
