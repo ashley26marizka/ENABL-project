@@ -1,0 +1,3 @@
+from app.routes.scenarios import router as scenarios_router
+
+__all__ = ["scenarios_router"]

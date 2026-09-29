@@ -1,0 +1,40 @@
+# Secrets - never commit
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Test artifacts
+.pytest_cache/
+*.db
+*.sqlite
+*.sqlite3
+
+# Build / packaging
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# C++ compiled binaries
+cpp/calculator
+cpp/calculator.exe
+
+# IDE folders
+.vscode/
+.idea/
+*.suo
+*.user
