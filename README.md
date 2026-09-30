@@ -2,6 +2,16 @@
 
 A production-quality platform that imports operational scenario execution data from CSV, calculates KPIs, stores results in PostgreSQL, and exposes them through a REST API.
 
+## Live Deployment
+
+| | URL |
+|---|---|
+| **API Base URL** | https://scenario-analytics-api-sgdw.onrender.com |
+| **Interactive Docs (Swagger UI)** | https://scenario-analytics-api-sgdw.onrender.com/docs |
+| **Health Check** | https://scenario-analytics-api-sgdw.onrender.com/health |
+
+> **Note:** Deployed on Render's free tier. If the first request takes ~30 seconds, the service is waking from sleep — wait briefly and retry.
+
 ---
 
 ## Features
@@ -11,7 +21,7 @@ A production-quality platform that imports operational scenario execution data f
 - PostgreSQL persistence (scenarios, runs, summaries)
 - REST API (FastAPI) with OpenAPI/Swagger docs
 - Standalone CLI pipeline runner
-- Docker + docker-compose for local development
+- docker-compose for local PostgreSQL development
 - C++ resource utilization calculator
 - Comprehensive pytest test suite
 
@@ -77,7 +87,7 @@ scenario-analytics-platform/
 │   │   ├── services/          # Pipeline orchestration + DB repository
 │   │   └── processing/        # CSV reader + KPI processor
 │   ├── requirements.txt
-│   └── Dockerfile
+│   └── runtime.txt
 ├── data/
 │   └── scenarios.csv          # 68-row realistic dataset
 ├── database/
@@ -88,8 +98,9 @@ scenario-analytics-platform/
 │   ├── main.cpp               # Resource utilization calculator
 │   └── README.md
 ├── docs/
-│   └── architecture.md        # Scalability system design
-├── tests/
+│   └── architecture.md        # Scalability system design + architecture diagram
+├── docs/
+│   └── architecture.svg       # Architecture diagram (SVG)
 │   ├── test_processing.py     # Processing engine tests
 │   └── test_api.py            # API endpoint tests
 ├── .env.example
@@ -292,41 +303,44 @@ calculator.exe
 
 ## Docker
 
-```bash
-# Start PostgreSQL + API
-docker-compose up --build
+Docker Compose is provided for **local PostgreSQL development only**. The API is not containerised — it runs directly with uvicorn. Deployment is handled by Render using `render.yaml`.
 
-# Run pipeline inside the container
-docker-compose exec api python -m app.run_pipeline
+```bash
+# Start a local PostgreSQL instance only
+docker-compose up db
 ```
 
-API available at `http://localhost:8000`
+This spins up a Postgres 16 container pre-loaded with `schema.sql` and `indexes.sql`. Then run the API locally with uvicorn as described in Local Setup above.
 
 ---
 
 ## Deployment
 
-The application is designed for deployment on **Render** or **Railway**.
+The application is deployed on **Render** (explicitly listed as an accepted platform in the project brief).
+
+### Live URLs
+
+| Resource | URL |
+|---|---|
+| API Base | https://scenario-analytics-api-sgdw.onrender.com |
+| Swagger UI | https://scenario-analytics-api-sgdw.onrender.com/docs |
+| Health | https://scenario-analytics-api-sgdw.onrender.com/health |
+| All Scenarios | https://scenario-analytics-api-sgdw.onrender.com/api/v1/scenarios |
 
 ### Environment Variables (required)
 
 | Variable | Description |
 |---|---|
 | `DATABASE_URL` | PostgreSQL connection string |
-| `CSV_PATH` | Path to scenarios CSV (default: `data/scenarios.csv`) |
+| `CSV_PATH` | Path to scenarios CSV (default: `../data/scenarios.csv`) |
 | `LOG_LEVEL` | Logging level (default: `INFO`) |
 
-### Render Deployment Steps
+### How it works on Render
 
-1. Push repository to GitHub.
-2. Create a new **Web Service** on Render pointing to the GitHub repo.
-3. Set **Root Directory** to `backend`.
-4. Set **Build Command**: `pip install -r requirements.txt`
-5. Set **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-6. Add a **PostgreSQL** database on Render and copy the connection string to `DATABASE_URL`.
-7. Run the pipeline once via the Render shell: `python -m app.run_pipeline`
-
-> **Deployment URL**: To be added after deployment is verified.
+- `render.yaml` defines the service configuration
+- `rootDir: backend` — commands run from inside `backend/`
+- On startup, `main.py` lifespan auto-seeds the database from CSV if empty
+- `DATABASE_URL` must be set manually in the Render dashboard (marked `sync: false` in `render.yaml`)
 
 ---
 
@@ -358,7 +372,7 @@ The application is designed for deployment on **Render** or **Railway**.
 | JSON responses + validation | Pydantic schemas + FastAPI | `schemas/__init__.py` |
 | C++ resource utilization + completion time | Console app with user input | `cpp/main.cpp` |
 | System design (100 → 10,000/day) | One-page design with diagram | `docs/architecture.md` |
-| Deployment | Docker + Render instructions | `docker-compose.yml`, README |
+| Deployment | Render (native Python runtime, no Docker needed) | `render.yaml`, README |
 | GitHub repository | Source code + README | Root of repository |
-| Architecture diagram | ASCII + Mermaid in docs | `docs/architecture.md` |
+| Architecture diagram | SVG diagram + scalability design doc | `docs/architecture.svg`, `docs/architecture.md` |
 | README with setup instructions | This file | `README.md` |

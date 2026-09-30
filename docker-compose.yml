@@ -1,5 +1,9 @@
 version: "3.9"
 
+# Docker Compose is provided for local PostgreSQL development only.
+# The API is NOT containerised — run it directly with uvicorn (see README).
+# Deployment is handled by Render using render.yaml.
+
 services:
   db:
     image: postgres:16-alpine
@@ -13,17 +17,6 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
       - ./database/indexes.sql:/docker-entrypoint-initdb.d/02_indexes.sql
-
-  api:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql://postgres:password@db:5432/scenario_analytics
-    depends_on:
-      - db
 
 volumes:
   pgdata:
